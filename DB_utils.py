@@ -141,6 +141,25 @@ def table_Tranzaktsiya():
         )
     ''')
 #endregion
+
+#region CREATE USER
+def create_user(login, password):
+    last_id = cursor.execute('''
+            SELECT ID FROM Dannve_avtorizacii
+    ''').fetchall()
+    new_id = 0
+    if last_id == []:
+        new_id=1
+    else:
+        new_id= last_id+1
+    cursor.execute('''
+        INSERT INTO Dannve_avtorizacii (ID, Login, Password, ID_Sotrudnik) VALUES(?,?,?,?)
+    ''', (new_id,login, password, new_id))
+#endregion
+
+create_user('Razvodyatel', '5421')
+connection.commit()
+connection.close()
 """
 '''
 Создание БД. Статус: Deprecated

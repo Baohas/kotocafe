@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='dashboard.css')}}">
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <div class="nav_item change_user">
+                <img class="icon" src="static/icons/icon_template.svg">
+                <p class="nav_text">Сменить пользователя</p>
+            </div>
+            <div class="nav_item profile">
+                <img class="icon" src="static/icons/icon_template.svg">
+                <p class="nav_text">Профиль</p>
+            </div>
+            <div class="nav_item posescheniya">
+                <img class="icon" src="static/icons/icon_template.svg">
+                <p class="nav_text">Посещения</p>
+            </div>
+            <div class="nav_item graphic">
+                <img class="icon" src="static/icons/icon_template.svg">
+                <p class="nav_text">График смен</p>
+            </div>
+        </nav>
+        <p class="greet_title">Добро пожаловать, {{user_name}} {{user_otchestvo}}</p>
+        <div class="smena_info">
+            <p class="info_text"><b>Смена: </b>{{smena_id}}</p>
+            <p class="info_text"><b>Дата: </b>{{smena_date}}</p>
+        </div>
+        <p class="text">Кассовая сумма <u>прошлой</u> смены:</p>
+        <p class="startoviy_ostatok">{{Nachalniy_ostatok}} руб</p>
+        <p class="subtitle">Введите сумму в кассе:</p>
+        <p class="text">Кассовая сумма на <u>начало</u> смены:</p>
+        <form>
+            <input type="number" placeholder="Введите сумму">
+            <input type="submit" value="Сохранить">
+        </form>
+    </div>
+
+</body>
+</html>

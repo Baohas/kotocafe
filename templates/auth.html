@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="{{
+    url_for('static', filename='auth.css')
+    }}">
+</head>
+<body>
+<div class="container">
+    <img class="logo" src="static/murchello_logo.png">
+    <p class="title">Пройдите авторизацию</p>
+    <p class="subtitle">Авторизуйтесь в системе чтобы начать смену</p>
+    <form action="/dashboard" method="post">
+      <p class="text {% if auth_class %}{{ auth_class }}{% endif %}">Имя пользователя*</p>
+      <input type="text" name="username" placeholder="Имя пользователя">
+      <p class="text {% if auth_class %}{{ auth_class }}{% endif %}">Пароль*</p>
+      <input type="password" name="password" placeholder="Пароль">
+      <input class="button" type="submit" value="Начать смену">
+    </form>
+  </div>
+<img class="paw paw1" src="static/paws1.png">
+<img class="paw paw2" src="static/paws2.png">
+<img class="paw paw3" src="static/paws3.png">
+<img class="cat" src="static/cat_sneaky.png">
+</body>
+</html>
