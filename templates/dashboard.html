@@ -41,18 +41,21 @@
             <input name="submit" type="submit" value="Сохранить">
         </form>
     </div>
-    <div class="confirm">
+    <div class="confirm hidden" id="confirm">
         <div class="confirm_form">
-            <p class="confirm_warning">Предупреждение<</p>
+            <p class="confirm_warning">Предупреждение</p>
             <hr>
             <p class="confirm_title">Вы уверены, что хотите выйти?</p>
             <p class="confirm_text">(вы будете перенаправлены на страницу авторизации)</p>
             <div class="confirm_buttons">
-                <a class="button" href="">Да</a>
-                <a class="button" href="">Нет</a>
+                <a class="button b_yes" id="b_yes" href="/change_user" onclick="confirm_close()">Да</a>
+                <a class="button b_no" id="b_no" onclick="confirm_close()">Нет</a>
             </div>
         </div>
     </div>
+    <img class="paw paw1" src="static/paws2.png">
+    <img class="paw paw2" src="static/paws1.png">
+    <img class="cat" src="static/cat_bored.png">
 
     <script src="{{url_for('static', filename='js/dashboard.js')}}"></script>
 </body>
