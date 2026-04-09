@@ -42,6 +42,7 @@ def authenticate():
         auth_class='failure'
         return render_template('auth.html', auth_class='failure')
 
+# Маршрут для страницы дэшборда
 @app.route('/dashboard')
 def dashboard():
     try:
@@ -50,10 +51,16 @@ def dashboard():
                            Nachalniy_ostatok=6666)
     except:
         return redirect('/login')
+
+# Редирект юзера на страницу авторизации
 @app.route('/change_user')
 def change_user():
     session.clear()
     return redirect('/login')
+
+@app.route('/profile')
+def profile_page():
+    return render_template('profile.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,14 @@
+body{
+    margin:0; padding:0;
+    height: 100vh;
+    background: linear-gradient(
+    to bottom,
+    #EDD2B8 0% 20%,
+    #EDC4A0 30%,
+    #73411F
+  );
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  display:flex; flex-direction: column; align-items:center; justify-content:center;
+}

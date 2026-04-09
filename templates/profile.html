@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  <div class="container">
+    <div class="title">Профиль</div>
+    <div class="photo_block">
+      <img class="user_avatar" src="{{session['Data']['avatar_url']}}">
+    </div>
+    <form>
+
+      <div class="input_block">
+        <p class="name">Фамилия</p>
+        <input disabled value="{{session['Data']['Family']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Имя</p>
+        <input disabled value="{{session['Data']['Name']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Отчество</p>
+        <input disabled value="{{session['Data']['Otchestvo']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Пол</p>
+        <div class="gender_block">
+          <input type="radio" value="Мужской" disabled>
+          <input type="radio" value="Женский" disabled>
+        </div>
+      </div>
+
+      <div class="input_block">
+        <p class="name">Должность</p>
+        <input disabled value="{{session['Data']['Doljnost']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Рабочий тел.</p>
+        <input disabled value="{{session['Data']['Work_phone']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Мобильный тел.</p>
+        <input disabled value="{{session['Data']['Phone']}}">
+      </div>
+
+      <div class="input_block">
+        <p class="name">Почта</p>
+        <input disabled value="{{session['Data']['Email']}}">
+      </div>
+    </form>
+
+    <div class="buttons">
+      <a><button>Редактировать</button></a>
+      <a href="/dashboard"><button>Назад</button></a>
+    </div>
+
+  </div>
+</body>
+</html>
