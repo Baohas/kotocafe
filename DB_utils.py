@@ -1,14 +1,14 @@
 #region CONNECTION TO DATABASE
 import sqlite3
-connection = sqlite3.connect('kotocafe.db')
-cursor = connection.cursor()
-#endregion
 
+#endregion
 #region DB TABLES
 '''
     В этом регионе описал создание всех сущностей БД с полями и связями
 '''
 def table_Dannye_avtorizacii():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS Dannve_avtorizacii(
         ID INTEGER PRIMARY KEY NOT NULL,
@@ -19,6 +19,8 @@ def table_Dannye_avtorizacii():
     )
     ''')
 def table_Pol():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Pol(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -27,6 +29,8 @@ def table_Pol():
         )
     ''')
 def table_Sotrudnik():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Sotrudnik(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -45,6 +49,8 @@ def table_Sotrudnik():
         )
     ''')
 def table_Kotocafe():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
          CREATE TABLE IF NOT EXISTS Kotocafe(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -59,6 +65,8 @@ def table_Kotocafe():
          )
     ''')
 def table_Role():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Role(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -67,6 +75,8 @@ def table_Role():
         )
     ''')
 def table_Kassovaya_sessiya():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Kassovaya_sessiya(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -83,6 +93,8 @@ def table_Kassovaya_sessiya():
         )
     ''')
 def table_Smena():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Smena(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -95,6 +107,8 @@ def table_Smena():
         )
     ''')
 def table_Tarif():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Tarif(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -106,6 +120,8 @@ def table_Tarif():
         )
     ''')
 def table_Doljnost():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Doljnost(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -114,6 +130,8 @@ def table_Doljnost():
         )
     ''')
 def table_Poseshenie():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Poseshenie(
             ID INTEGER PRIMARY KEY NOT NULL,
@@ -128,6 +146,8 @@ def table_Poseshenie():
         )
     ''')
 def table_Tranzaktsiya():
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS Tranzaktsiya(
         ID INTEGER PRIMARY KEY NOT NULL,
@@ -141,9 +161,10 @@ def table_Tranzaktsiya():
         )
     ''')
 #endregion
-
 #region CREATE USER
 def create_user(login, password):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
     last_id = cursor.execute('''
             SELECT ID FROM Dannve_avtorizacii
     ''').fetchall()
@@ -151,15 +172,36 @@ def create_user(login, password):
     if last_id == []:
         new_id=1
     else:
-        new_id= last_id+1
+        new_id= last_id[0][0]+1
     cursor.execute('''
         INSERT INTO Dannve_avtorizacii (ID, Login, Password, ID_Sotrudnik) VALUES(?,?,?,?)
     ''', (new_id,login, password, new_id))
 #endregion
+#region GET USER DATA
+def get_user_data(login):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    data = {}
+    x=cursor.execute('''
+        SELECT ID_Sotrudnik FROM Dannve_avtorizacii WHERE Login = ?
+    ''',(login,)).fetchone()
+    data['ID_Sotrudnik'] = x[0]
+    x = cursor.execute('''
+            SELECT * FROM Sotrudnik WHERE ID = ?
+        ''', (data['ID_Sotrudnik'],)).fetchone()
+    data['Family'],data['Name'],data['Otchestvo'],data['Phone'], data['Work_phone'],data['Email'], data['ID_Role'],data['ID_Doljnost'],data['ID_Pol'] = x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]
+    connection.close()
+    return data
+#endregion
+"""def sotrudnik(ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol):
+    cursor.execute('''
+        INSERT INTO Sotrudnik (ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,
+         ID_Role, ID_Doljnost, ID_Pol) VALUES (?,?,?,?,?,?,?,?,?,?)
+    ''', (ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol))
+sotrudnik(1, 'Оболенский', 'Даниил','Алексеевич', '88005553535', '88006663636',
+          'example@gmail.com', '1','1','1',)"""
+get_user_data('Razvodyatel')
 
-create_user('Razvodyatel', '5421')
-connection.commit()
-connection.close()
 """
 '''
 Создание БД. Статус: Deprecated

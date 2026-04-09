@@ -41,3 +41,60 @@ text-align: center;
     margin-top:-2%;
     margin-bottom:10%;
 }
+.greet_title{
+    text-align:center; font-size: 6em; margin-top:8%;
+    font-weight: 800; color: rgb(115,65,31);
+    margin-bottom: 0;
+}
+.smena_info{
+    display: flex; flex-direction: row; color: rgb(115,65,31);
+    font-size: 4em; width:90%; align-items: center; justify-content: space-between;
+}
+.text{
+    color: rgb(115,65,31); font-size: 3.5em; margin-top: 0;
+}
+.startoviy_ostatok{
+    color: white; font-size: 4em; margin: 0; width: 50%; text-align: center;
+}
+.startoviy_ostatok::after{
+    display: block; content: "";
+    background-color: rgb(115,65,31); width:auto; height: 4px;
+}
+.subtitle{
+    color:  rgb(115,65,31); font-size: 4em; font-weight: bold;
+}
+form{
+    width: 80%; display: flex; flex-direction: column; align-items: center;
+    justify-content: space-between;
+}
+input[type="number"]{
+    width: 100%; font-size: 3.5em;
+    padding: 15px 50px; border-radius: 100px; height: 100px;
+    width: 90%;
+    box-shadow: 0 0 20px black;
+    margin-bottom: 5%;
+    border: none;
+}
+input[type="submit"]{
+    font-size: 5em; 
+    background-color: rgb(115,65,31);
+    color: #edd2b8;
+    border: none; padding: 15px 50px;
+    border-radius: 100px;
+    width: 90%; box-shadow: 0 0 20px black;
+    margin-top: 8%;
+}
+.blur{
+   filter: blur(20px);
+}
+.confirm{
+    position: absolute;
+    width: 100%; height: 100vh; background-color: transparent;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.confirm_form{
+    background-color: rgb(232,203,176);
+    width: 80%; height: 20%;
+    border: 5px solid rgb(69,40,21);
+    border-radius: 50px;
+}

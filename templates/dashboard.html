@@ -6,12 +6,14 @@
     <link rel="stylesheet" href="{{url_for('static', filename='dashboard.css')}}">
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <nav>
+
             <div class="nav_item change_user">
-                <img class="icon" src="static/icons/icon_template.svg">
+                <a onclick="confirm()" ><img class="icon" src="static/icons/icon_template.svg"></a>
                 <p class="nav_text">Сменить пользователя</p>
             </div>
+
             <div class="nav_item profile">
                 <img class="icon" src="static/icons/icon_template.svg">
                 <p class="nav_text">Профиль</p>
@@ -35,10 +37,23 @@
         <p class="subtitle">Введите сумму в кассе:</p>
         <p class="text">Кассовая сумма на <u>начало</u> смены:</p>
         <form>
-            <input type="number" placeholder="Введите сумму">
-            <input type="submit" value="Сохранить">
+            <input name="Nachalniy_ostatok" type="number" placeholder="Введите сумму">
+            <input name="submit" type="submit" value="Сохранить">
         </form>
     </div>
+    <div class="confirm">
+        <div class="confirm_form">
+            <p class="confirm_warning">Предупреждение<</p>
+            <hr>
+            <p class="confirm_title">Вы уверены, что хотите выйти?</p>
+            <p class="confirm_text">(вы будете перенаправлены на страницу авторизации)</p>
+            <div class="confirm_buttons">
+                <a class="button" href="">Да</a>
+                <a class="button" href="">Нет</a>
+            </div>
+        </div>
+    </div>
 
+    <script src="{{url_for('static', filename='js/dashboard.js')}}"></script>
 </body>
 </html>
