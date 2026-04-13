@@ -12,3 +12,72 @@ body{
   background-position: center center;
   display:flex; flex-direction: column; align-items:center; justify-content:center;
 }
+.container{
+  width: 90%; height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+}
+.title{
+  background-color: rgb(115, 65, 31); width: 90%;
+  font-size: 3em; padding: 1%; margin-top: 5%; color: #EDD2B8;
+  border: none; border-radius: 50px;
+}
+.photo_block{
+  width: 20%; margin-top: 3%;
+}
+.user_avatar{
+  width: 175px; height: 175px; border-radius: 50%;
+}
+form{
+  width: 100%;
+}
+.input_block{
+  width: 100%; display: flex; flex-direction: row; align-items: center;
+  justify-content: space-between;
+}
+.name{
+  font-size: 2.5em; font-weight: 900; color:rgb(69, 40, 21);
+}
+input{
+  width: 50%;font-size: 2.5em; background-color: transparent; border: none;
+  color:#73411F; text-align: left; border-bottom: 2px solid #73411F;
+}
+.gender_block{
+  width: 50%; display: flex; flex-direction: row; justify-content: space-between;
+  align-items: center;
+}
+input[type=radio]{
+  width: 20%;
+}
+.block{
+  width: 50%; display: flex; flex-direction: row; 
+  font-size: 2em; text-align: left; color:rgb(69, 40, 21); font-weight: 900;
+}
+.master_info{
+  color:#73411F; font-weight: 900;
+  width: 100%; display: flex; flex-direction: row; align-items: center;
+  justify-content: space-between; text-align: left; font-size: 1.5em; 
+}
+.dop{
+  display: flex; flex-direction: column; align-items: center;text-align: left;
+  width: 40%; padding:0; font-size:1.8em;
+}
+.doljnost{
+  text-align: left; width: 100%; margin:0;
+}
+.master_FIO{
+  text-align: left; width: 100%;
+}
+.useless_info{
+  width: 40%; padding:0; font-size: 1.8em; text-align: center;
+}
+.buttons{
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+  margin-top: 3%;
+}
+a{width: 100%;}
+.btn{
+  font-size: 4em; width: 70%; padding: 2% 5%; margin-bottom: 5%;
+  border: none; background-color: rgb(115,65,31);
+    color: #edd2b8; border-radius: 100px;
+}

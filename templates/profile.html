@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Профиль</title>
+  <link rel="stylesheet" href="{{url_for('static', filename='profile.css')}}">
 </head>
 <body>
   <div class="container">
     <div class="title">Профиль</div>
     <div class="photo_block">
-      <img class="user_avatar" src="{{session['Data']['avatar_url']}}">
+      <img class="user_avatar" src="static/{{session['Data']['avatar_url']}}">
     </div>
     <form>
 
@@ -30,8 +31,15 @@
       <div class="input_block">
         <p class="name">Пол</p>
         <div class="gender_block">
-          <input type="radio" value="Мужской" disabled>
-          <input type="radio" value="Женский" disabled>
+          <div class="block">
+            <input type="radio" value="" disabled>
+            <p class="block_text">Мужской</p>
+          </div>
+          <div class="block">
+            <input type="radio" value="" disabled>
+            <p class="block_text">Женский</p>
+          </div>
+
         </div>
       </div>
 
@@ -56,11 +64,19 @@
       </div>
     </form>
 
-    <div class="buttons">
-      <a onclick="edit_profile()"><button>Редактировать</button></a>
-      <a href="/dashboard"><button>Назад</button></a>
+    <div class="master_info">
+      <div class="master_info dop">
+        <p class="doljnost">Руководитель</p>
+        <p class="master_FIO">Владимиров Владимир Владимировоч</p>
+      </div>
+      <div class="useless_info">Главный управляющий</div>
     </div>
-/
+
+    <div class="buttons">
+      <a onclick="edit_profile()"><button class="btn">Редактировать</button></a>
+      <a href="/dashboard"><button class="btn">Назад</button></a>
+    </div>
+
   </div>
 </body>
 </html>

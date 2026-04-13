@@ -190,6 +190,7 @@ def get_user_data(login):
             SELECT * FROM Sotrudnik WHERE ID = ?
         ''', (data['ID_Sotrudnik'],)).fetchone()
     data['Family'],data['Name'],data['Otchestvo'],data['Phone'], data['Work_phone'],data['Email'], data['ID_Role'],data['ID_Doljnost'],data['ID_Pol'] = x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9]
+    data['avatar_url'] = "user_avatar.png"
     connection.close()
     return data
 #endregion
