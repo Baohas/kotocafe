@@ -1,6 +1,8 @@
 #region CONNECTION TO DATABASE
 import sqlite3
-
+import calendar
+import datetime
+calendar.setfirstweekday(calendar.MONDAY)
 #endregion
 #region DB TABLES
 '''
@@ -193,6 +195,122 @@ def get_user_data(login):
     data['avatar_url'] = "user_avatar.png"
     connection.close()
     return data
+
+def get_employee_by_ID(id):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    if id==0:
+        d = cursor.execute('''
+                SELECT Family FROM Sotrudnik
+            ''').fetchall()
+        return d
+    else:
+        d = cursor.execute('''
+            SELECT Family FROM Sotrudnik WHERE ID = ?
+        ''', (id,)).fetchone()
+        return d[0]
+
+def get_calendar_data(year, month, shifts_by_date):
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    days_in_prev = calendar.monthrange(prev_year, prev_month)[1]
+    # Текущий
+    days_in_current = calendar.monthrange(year, month)[1]
+    first_weekday = calendar.monthrange(year, month)[0]  # 0 = понедельник
+    # Следующий
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
+
+    grid = []
+    # Дни предыдущего месяца
+    for i in range(first_weekday):
+        day_num = days_in_prev - first_weekday + i + 1
+        date_str = f"{prev_year}-{prev_month:02d}-{day_num:02d}"
+        grid.append(
+            {'date': date_str, 'day': day_num, 'is_current_month': False, 'shifts': shifts_by_date.get(date_str, [])})
+
+    # Дни текущего месяца
+    for d in range(1, days_in_current + 1):
+        date_str = f"{year}-{month:02d}-{d:02d}"
+        grid.append({'date': date_str, 'day': d, 'is_current_month': True, 'shifts': shifts_by_date.get(date_str, [])})
+
+    # Заполняем оставшиеся ячейки днями следующего месяца
+    remaining = 42 - len(grid)
+    for i in range(remaining):
+        date_str = f"{next_year}-{next_month:02d}-{i + 1:02d}"
+        grid.append(
+            {'date': date_str, 'day': i + 1, 'is_current_month': False, 'shifts': shifts_by_date.get(date_str, [])})
+
+    weeks = [grid[i:i + 7] for i in range(0, len(grid), 7)]
+    return weeks
+
+def create_shift(date, start_time, end_time, ID_sotrud):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    last_id = cursor.execute('''
+                SELECT ID FROM Smena
+        ''').fetchall()
+    new_id = 0
+    if last_id == []:
+        new_id = 1
+    else:
+        new_id= last_id[0][0]+1
+    cursor.execute('''
+        INSERT INTO Smena (ID, Date, Planovoe_nachalo, Planovoe_okonchanie, Dlitelnost, ID_Sotrudnik) VALUES(?,?,?,?,?,?)
+    ''', (new_id,date, start_time, end_time, 0, 1))
+    connection.commit()
+    connection.close()
+
+def get_shifts(year=None, month=None):
+
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    if year is None or month is None:
+        year = datetime.datetime.now().year
+        month = datetime.datetime.now().month
+    start_date = f"01.{month:02d}.{year}"
+    end_date = f"01.{1 if month == 12 else month + 1:02d}.{year + 1 if month == 12 else year}"
+    rows = cursor.execute('''
+        SELECT Date, Planovoe_nachalo, Planovoe_okonchanie, ID_Sotrudnik FROM Smena WHERE Date >= ? AND Date < ?
+    ''', (start_date, end_date)).fetchall()
+    shifts_by_date = {}
+    for row in rows:
+        d = row[0]
+
+        shifts_by_date.setdefault(d, []).append({
+            'employee': get_employee_by_ID(row[3]),
+            'start': row[1],
+            'end':row[2]
+        })
+
+    weeks = get_calendar_data(year, month, shifts_by_date)
+    months = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь',
+                      7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'}
+    month_name = months[month]
+
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
+
+    employees = [i for i in get_employee_by_ID(0)[0]]
+
+    data = {
+        'weeks': weeks,
+        'year': year,
+        'month': month,
+        'month_name': month_name,
+        'employees': employees,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month
+    }
+    return data
+
+get_shifts()
+
+
 #endregion
 """def sotrudnik(ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol):
     cursor.execute('''
@@ -201,7 +319,7 @@ def get_user_data(login):
     ''', (ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol))
 sotrudnik(1, 'Оболенский', 'Даниил','Алексеевич', '88005553535', '88006663636',
           'example@gmail.com', '1','1','1',)"""
-get_user_data('Razvodyatel')
+
 
 """
 '''

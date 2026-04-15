@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>График смен</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='smeny.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header как на скриншоте -->
+        <div class="header">
+            <div class="header-top">
+              <h1 class="title">График смен</h1>
+                <div class="employee-select">
+                    <label>Сотрудник</label>
+                    <select id="employee-select" onchange="filterByEmployee()">
+                        <option value="">Все сотрудники</option>
+                        {% for emp in employees %}
+                        <option value="{{ emp }}">{{ emp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+            </div>
+
+            <!-- Месяц и год -->
+            <div class="month-header">
+                <a href="/schedule?year={{ prev_year }}&month={{ prev_month }}" class="month-arrow">◀</a>
+                <span class="month-name">{{ month_name }} {{ year }}</span>
+                <a href="/schedule?year={{ next_year }}&month={{ next_month }}" class="month-arrow">▶</a>
+            </div>
+        </div>
+
+        <!-- Календарь -->
+        <div class="calendar">
+            <!-- Заголовки дней недели (пн-вс) -->
+            <div class="weekdays">
+                <div class="weekday">пн</div>
+                <div class="weekday">вт</div>
+                <div class="weekday">ср</div>
+                <div class="weekday">чт</div>
+                <div class="weekday">пт</div>
+                <div class="weekday">сб</div>
+                <div class="weekday">вс</div>
+            </div>
+
+            <!-- Недели -->
+            {% for week in weeks %}
+            <div class="week">
+                {% for day in week %}
+                <div
+                    class="day
+                           {% if not day.is_current_month %}other-month{% endif %}
+                           {% if day.is_current_month %}current-month clickable{% endif %}"
+                    data-date="{{ day.date }}"
+                    {% if day.is_current_month %}onclick="openAddModal('{{ day.date }}')"{% endif %}>
+
+                    <!-- Номер дня -->
+                    <div class="day-number">
+                        {{ day.day }}
+                    </div>
+
+                    <!-- Смены из БД -->
+                    <div class="shifts-container">
+                        {% for shift in day.shifts %}
+                        <div class="shift">
+                            <div class="shift-time">{{ shift.start }} — {{ shift.end }}</div>
+                            <div class="shift-employee">{{ shift.employee }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Кнопки внизу как на скриншоте -->
+        <div class="footer-buttons">
+            <button onclick="history.back()" class="btn btn-back">Назад</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления смены -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h2>Добавить смену на <span id="modal-date-display"></span></h2>
+
+            <form id="addShiftForm">
+                <input type="hidden" id="modal-date" value="">
+
+                <div class="form-group">
+                    <label for="modal-employee">Сотрудник</label>
+                    <select id="modal-employee" required>
+                        {% for emp in employees %}
+                        <option value="{{ emp }}">{{ emp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal-start">Начало смены</label>
+                    <input type="time" id="modal-start" value="10:00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal-end">Конец смены</label>
+                    <input type="time" id="modal-end" value="20:00" required>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" onclick="closeModal()" class="btn btn-cancel">Отмена</button>
+                    <button type="button" onclick="saveNewShift()" class="btn btn-confirm">Сохранить смену</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Открыть модалку добавления смены
+         */
+        function openAddModal(date) {
+            document.getElementById('modal-date').value = date;
+            document.getElementById('modal-date-display').textContent = date.split('-').reverse().join('.');
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        /**
+         * Закрыть модалку
+         */
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+
+        /**
+         * Сохранить новую смену в БД через AJAX (POST /schedule)
+         */
+        function saveNewShift() {
+            const date = document.getElementById('modal-date').value;
+            const employee = document.getElementById('modal-employee').value;
+            const startTime = document.getElementById('modal-start').value;
+            const endTime = document.getElementById('modal-end').value;
+
+            if (!employee || !startTime || !endTime) {
+                alert('Заполните все поля!');
+                return;
+            }
+
+            fetch('/schedule', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    date: date,
+                    employee: employee,
+                    start_time: startTime,
+                    end_time: endTime
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    location.reload(); // Перезагрузка страницы — новые смены сразу подгрузятся из БД
+                } else {
+                    alert('Ошибка сохранения: ' + (data.error || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Не удалось отправить запрос');
+            });
+        }
+
+        /**
+         * Перейти на текущий месяц/год
+         */
+        function goToToday() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth() + 1;
+            window.location.href = `/schedule?year=${y}&month=${m}`;
+        }
+
+        /**
+         * Простая клиентская фильтрация по сотруднику (по желанию)
+         */
+        function filterByEmployee() {
+            const selected = document.getElementById('employee-select').value;
+            const allShifts = document.querySelectorAll('.shift');
+
+            allShifts.forEach(shift => {
+                if (!selected) {
+                    shift.style.display = 'block';
+                } else {
+                    shift.style.display = shift.querySelector('.shift-employee').textContent === selected ? 'block' : 'none';
+                }
+            });
+        }
+
+        // Закрытие модалки по клику вне окна
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('addModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            console.log('%c✅ HTML-шаблон графика смен загружен и готов к работе с SQLite', 'color: #8d5f3f; font-weight: bold');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+/* static/css/schedule.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5e8d3;
+    color: #3f2a1e;
+    padding: 20px;
+}
+
+.app-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background: #6b4e3d;
+    color: #fff;
+    padding: 15px 25px;
+}
+
+.header-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.today-btn {
+    background: #8d5f3f;
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.today-btn:hover {
+    background: #a16f4f;
+    transform: scale(1.05);
+}
+
+.employee-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    padding: 8px 15px;
+    border-radius: 50px;
+}
+
+.employee-select label {
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.employee-select select {
+    background: #fff;
+    color: #3f2a1e;
+    border: none;
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 1rem;
+}
+
+.title {
+    text-align: center;
+    width:100%;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.month-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 12px;
+    font-size: 1.5rem;
+}
+
+.month-arrow {
+    color: #fff;
+    font-size: 2rem;
+    text-decoration: none;
+    padding: 5px 15px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.month-arrow:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Календарь */
+.calendar {
+    padding: 20px 25px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    background: #8d5f3f;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.weekday {
+    padding: 12px 8px;
+    font-size: 1.1rem;
+}
+
+.week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border: 1px solid #e8d9c4;
+    border-top: none;
+}
+
+.day {
+    min-height: 130px;
+    padding: 10px;
+    border-right: 1px solid #e8d9c4;
+    border-bottom: 1px solid #e8d9c4;
+    background: #fffaf0;
+    position: relative;
+    transition: background 0.2s;
+}
+
+.day.other-month {
+    background: #f8f0e0;
+    opacity: 0.6;
+}
+
+.day.current-month {
+    background: #fff;
+}
+
+.day.clickable:hover {
+    background: #fff9e6;
+    cursor: pointer;
+}
+
+.day-number {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #6b4e3d;
+    margin-bottom: 8px;
+}
+
+.shifts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.95rem;
+}
+
+.shift {
+    background: #f5e8d3;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border-left: 4px solid #8d5f3f;
+}
+
+.shift-time {
+    font-weight: 700;
+    color: #3f2a1e;
+}
+
+.shift-employee {
+    font-size: 0.9rem;
+    color: #6b4e3d;
+    margin-top: 2px;
+}
+
+/* Footer buttons */
+.footer-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 25px;
+    background: #f5e8d3;
+}
+
+.btn {
+    padding: 14px 40px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-back {
+    background: #8d5f3f;
+    color: #fff;
+}
+
+.btn-save {
+    background: #3f2a1e;
+    color: #fff;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(63, 42, 30, 0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #6b4e3d;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #3f2a1e;
+}
+
+.form-group select,
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e8d9c4;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-cancel {
+    background: #e8d9c4;
+    color: #3f2a1e;
+    flex: 1;
+}
+
+.btn-confirm {
+    background: #8d5f3f;
+    color: #fff;
+    flex: 1;
+}
