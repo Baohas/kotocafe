@@ -164,20 +164,7 @@ def table_Tranzaktsiya():
     ''')
 #endregion
 #region CREATE USER
-def create_user(login, password):
-    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
-    cursor = connection.cursor()
-    last_id = cursor.execute('''
-            SELECT ID FROM Dannve_avtorizacii
-    ''').fetchall()
-    new_id = 0
-    if last_id == []:
-        new_id=1
-    else:
-        new_id= last_id[0][0]+1
-    cursor.execute('''
-        INSERT INTO Dannve_avtorizacii (ID, Login, Password, ID_Sotrudnik) VALUES(?,?,?,?)
-    ''', (new_id,login, password, new_id))
+
 #endregion
 #region GET USER DATA
 def get_user_data(login):
@@ -196,6 +183,13 @@ def get_user_data(login):
     connection.close()
     return data
 
+def get_ID_by_family(family):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    data = cursor.execute('''
+        SELECT ID FROM Sotrudnik WHERE Family = ?
+    ''', (family, )).fetchone()
+    return data[0]
 def get_employee_by_ID(id):
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
     cursor = connection.cursor()
@@ -225,26 +219,40 @@ def get_calendar_data(year, month, shifts_by_date):
     # Дни предыдущего месяца
     for i in range(first_weekday):
         day_num = days_in_prev - first_weekday + i + 1
-        date_str = f"{prev_year}-{prev_month:02d}-{day_num:02d}"
+        date_str = f"{day_num:02d}.{prev_month:02d}.{prev_year}"
         grid.append(
             {'date': date_str, 'day': day_num, 'is_current_month': False, 'shifts': shifts_by_date.get(date_str, [])})
 
     # Дни текущего месяца
     for d in range(1, days_in_current + 1):
-        date_str = f"{year}-{month:02d}-{d:02d}"
+        date_str = f"{d:02d}.{month:02d}.{year}"
         grid.append({'date': date_str, 'day': d, 'is_current_month': True, 'shifts': shifts_by_date.get(date_str, [])})
 
     # Заполняем оставшиеся ячейки днями следующего месяца
     remaining = 42 - len(grid)
     for i in range(remaining):
-        date_str = f"{next_year}-{next_month:02d}-{i + 1:02d}"
+        date_str = f"{i + 1:02d}.{next_month:02d}.{next_year}"
         grid.append(
             {'date': date_str, 'day': i + 1, 'is_current_month': False, 'shifts': shifts_by_date.get(date_str, [])})
 
     weeks = [grid[i:i + 7] for i in range(0, len(grid), 7)]
     return weeks
 
-def create_shift(date, start_time, end_time, ID_sotrud):
+def create_user(login, password):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    last_id = cursor.execute('''
+            SELECT ID FROM Dannve_avtorizacii
+    ''').fetchall()
+    new_id = 0
+    if last_id == []:
+        new_id=1
+    else:
+        new_id= last_id[-1][0]+1
+    cursor.execute('''
+        INSERT INTO Dannve_avtorizacii (ID, Login, Password, ID_Sotrudnik) VALUES(?,?,?,?)
+    ''', (new_id,login, password, new_id))
+def create_shift(date, start_time, end_time, employee):
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
     cursor = connection.cursor()
     last_id = cursor.execute('''
@@ -254,10 +262,11 @@ def create_shift(date, start_time, end_time, ID_sotrud):
     if last_id == []:
         new_id = 1
     else:
-        new_id= last_id[0][0]+1
+        new_id= last_id[-1][0]+1
+    fam = get_ID_by_family(employee)
     cursor.execute('''
         INSERT INTO Smena (ID, Date, Planovoe_nachalo, Planovoe_okonchanie, Dlitelnost, ID_Sotrudnik) VALUES(?,?,?,?,?,?)
-    ''', (new_id,date, start_time, end_time, 0, 1))
+    ''', (new_id,date, start_time, end_time, 0, fam))
     connection.commit()
     connection.close()
 
@@ -308,7 +317,7 @@ def get_shifts(year=None, month=None):
     }
     return data
 
-get_shifts()
+
 
 
 #endregion

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 import sqlite3
 
 
@@ -67,12 +67,35 @@ def profile_page():
 
 @app.route('/schedule', methods=['GET', 'POST'])
 def schedule_page():
+    if 'Data' not in session:
+        if request.method == 'POST':
+            return jsonify({'success': False, 'error': 'Не авторизован'}), 401
+        return redirect('/login')
     year = request.args.get('year', datetime.now().year, type=int)
     month = request.args.get('month', datetime.now().month, type=int)
-    data = DB_utils.get_shifts(year, month)
+
     if request.method=='POST':
-        pass
-    print(data['weeks'])
+        try:
+            if not request.is_json:
+                print("❌ Запрос не содержит JSON (Content-Type:", request.content_type, ")")
+                return jsonify({'success': False, 'error': 'Content-Type должен быть application/json'}), 415
+            data = request.get_json()
+            print("📥 Получено от JS:", data)
+            DB_utils.create_shift(data['date'],data['start_time'], data['end_time'], data['employee'])
+
+
+            if data is None or not isinstance(data, dict):
+                return jsonify({'success': False, 'error': 'Пустое или некорректное JSON тело'}), 400
+
+            if not all(k in data for k in ['date', 'employee', 'start_time', 'end_time']):
+                return jsonify({'success': False, 'error': 'Отсутствуют обязательные поля'}), 400
+
+            return jsonify({'success': True})
+        except Exception as e:
+            print("Ошибка при добавлении смены:", e)
+            return jsonify({'success': False, 'error': str(e)}), 400
+
+    data = DB_utils.get_shifts(year, month)
     return render_template('smeny.html', weeks=data['weeks'],
                            year=data['year'], month_name=data['month_name'],
                            employees=data['employees'], prev_year=data['prev_year'],
