@@ -271,7 +271,6 @@ def create_shift(date, start_time, end_time, employee):
     connection.close()
 
 def get_shifts(year=None, month=None):
-
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
     cursor = connection.cursor()
     if year is None or month is None:
@@ -280,7 +279,7 @@ def get_shifts(year=None, month=None):
     start_date = f"01.{month:02d}.{year}"
     end_date = f"01.{1 if month == 12 else month + 1:02d}.{year + 1 if month == 12 else year}"
     rows = cursor.execute('''
-        SELECT Date, Planovoe_nachalo, Planovoe_okonchanie, ID_Sotrudnik FROM Smena WHERE Date >= ? AND Date < ?
+        SELECT Date, Planovoe_nachalo, Planovoe_okonchanie, ID_Sotrudnik, ID FROM Smena WHERE Date >= ? AND Date < ?
     ''', (start_date, end_date)).fetchall()
     shifts_by_date = {}
     for row in rows:
@@ -289,7 +288,8 @@ def get_shifts(year=None, month=None):
         shifts_by_date.setdefault(d, []).append({
             'employee': get_employee_by_ID(row[3]),
             'start': row[1],
-            'end':row[2]
+            'end':row[2],
+            'id': row[3]
         })
 
     weeks = get_calendar_data(year, month, shifts_by_date)
@@ -317,8 +317,17 @@ def get_shifts(year=None, month=None):
     }
     return data
 
-
-
+def update_shift(employee, start_time, end_time, id_smena):
+    connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
+    cursor = connection.cursor()
+    cursor.execute('''
+        UPDATE Smena
+        SET ID_Sotrudnik = ?, Planovoe_nachalo = ?, Planovoe_okonchanie = ?
+        WHERE ID = ? 
+    ''', (get_ID_by_family(employee), start_time, end_time, id_smena))
+    connection.commit()
+    connection.close()
+    print("Updated!")
 
 #endregion
 """def sotrudnik(ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol):

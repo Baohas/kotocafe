@@ -1,12 +1,11 @@
 from datetime import datetime
-
 from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 import sqlite3
-
+import DB_utils
 
 app = Flask(__name__)
 app.secret_key = 'my_strong_secret_key_hz'
-import DB_utils
+
 #функция подключения к БД
 def get_db_connection():
     conn = sqlite3.connect('kotocafe.db')
@@ -77,11 +76,13 @@ def schedule_page():
     if request.method=='POST':
         try:
             if not request.is_json:
-                print("❌ Запрос не содержит JSON (Content-Type:", request.content_type, ")")
                 return jsonify({'success': False, 'error': 'Content-Type должен быть application/json'}), 415
             data = request.get_json()
-            print("📥 Получено от JS:", data)
-            DB_utils.create_shift(data['date'],data['start_time'], data['end_time'], data['employee'])
+            print(data)
+            if data.get('id'):
+                DB_utils.update_shift(data['employee'],data['start_time'], data['end_time'],data['id'])
+            else:
+                DB_utils.create_shift(data['date'],data['start_time'], data['end_time'], data['employee'])
 
 
             if data is None or not isinstance(data, dict):

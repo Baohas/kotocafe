@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Header как на скриншоте -->
+
         <div class="header">
             <div class="header-top">
               <h1 class="title">График смен</h1>
@@ -64,24 +64,34 @@
 
                     <!-- Смены из БД -->
                     <div class="shifts-container">
-                        {% for shift in day.shifts %}
-                        <div class="shift">
-                            <div class="shift-time">{{ shift.start }} — {{ shift.end }}</div>
-                            <div class="shift-employee">{{ shift.employee }}</div>
-                        </div>
-                        {% endfor %}
-                    </div>
+    {% for shift in day.shifts %}
+    <div class="shift"
+         data-id="{{ shift.id }}"
+         data-date="{{ day.date }}"
+         data-employee="{{ shift.employee }}"
+         data-start="{{ shift.start }}"
+         data-end="{{ shift.end }}"
+         onclick="openEditModal(this)"
+         style="cursor: pointer;">
+        <div class="shift-time">{{ shift.start }} — {{ shift.end }}</div>
+        <div class="shift-employee">{{ shift.employee }}</div>
+    </div>
+    {% endfor %}
+</div>
+                    <!-- === МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ === -->
+
                 </div>
                 {% endfor %}
             </div>
             {% endfor %}
         </div>
 
-        <!-- Кнопки внизу как на скриншоте -->
         <div class="footer-buttons">
             <button onclick="history.back()" class="btn btn-back">Назад</button>
         </div>
     </div>
+
+
 
     <!-- Модальное окно для добавления смены -->
     <div id="addModal" class="modal">
@@ -117,6 +127,48 @@
             </form>
         </div>
     </div>
+    <div id="editModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Редактирование смены</h2>
+            <span onclick="closeEditModal()" style="cursor:pointer; font-size:1.8rem; float:right;">&times;</span>
+        </div>
+
+        <div class="form-group">
+            <label>Дата</label>
+            <p id="edit-date-display" style="font-weight:700; margin:8px 0;"></p>
+        </div>
+
+        <input type="hidden" id="edit-id">
+        <input type="hidden" id="edit-date">
+
+        <div class="form-group">
+            <label for="edit-employee">Сотрудник</label>
+            <select id="edit-employee" required>
+                {% for emp in employees %}
+                <option value="{{ emp }}">{{ emp }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-start">Плановое начало</label>
+            <input type="time" id="edit-start" required>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-end">Плановое окончание</label>
+            <input type="time" id="edit-end" required>
+        </div>
+
+
+
+        <div class="modal-buttons">
+            <button type="button" onclick="closeEditModal()" class="btn btn-cancel">Отмена</button>
+            <button type="button" onclick="saveEditShift()" class="btn btn-confirm">Сохранить</button>
+        </div>
+    </div>
+</div>
     <script src="{{url_for('static', filename='js/smeny.js')}}"></script>
 </body>
 </html>

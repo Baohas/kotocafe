@@ -76,7 +76,7 @@
         }
 
         /**
-         * Простая клиентская фильтрация по сотруднику (по желанию)
+         * Простая клиентская фильтрация по сотруднику
          */
         function filterByEmployee() {
             const selected = document.getElementById('employee-select').value;
@@ -98,5 +98,71 @@
                 if (e.target === modal) closeModal();
             });
 
-            console.log('%c✅ HTML-шаблон графика смен загружен и готов к работе с SQLite', 'color: #8d5f3f; font-weight: bold');
+            console.log('Все ок!');
         });
+/**
+ * Открыть модалку редактирования
+ */
+function openEditModal(element) {
+    const id       = element.dataset.id;
+    const date     = element.dataset.date;
+    const employee = element.dataset.employee;
+    const start    = element.dataset.start;
+    const end      = element.dataset.end;
+
+    document.getElementById('edit-id').value = id;
+    document.getElementById('edit-date').value = date;
+    document.getElementById('edit-date-display').textContent = date.split('-').reverse().join('.');
+
+    document.getElementById('edit-employee').value = employee;
+    document.getElementById('edit-start').value = start;
+    document.getElementById('edit-end').value = end;
+
+    document.getElementById('editModal').classList.add('show');
+}
+
+/**
+ * Закрыть модалку редактирования
+ */
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('show');
+}
+
+/**
+ * Сохранить изменения смены
+ */
+function saveEditShift() {
+    const id        = document.getElementById('edit-id').value;
+    const date      = document.getElementById('edit-date').value;
+    const employee  = document.getElementById('edit-employee').value;
+    const startTime = document.getElementById('edit-start').value;
+    const endTime   = document.getElementById('edit-end').value;
+
+    const payload = {
+        id: id,
+        date: date,
+        employee: employee,
+        start_time: startTime,
+        end_time: endTime
+    };
+
+    fetch('/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeEditModal();
+            location.reload();
+        } else {
+            alert('Ошибка: ' + (data.error || 'Неизвестно'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Не удалось сохранить изменения');
+    });
+}
