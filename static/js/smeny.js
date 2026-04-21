@@ -2,10 +2,25 @@
          * Открыть модалку добавления смены
          */
         function openAddModal(date) {
-            document.getElementById('modal-date').value = date;
-            document.getElementById('modal-date-display').textContent = date.split('-').reverse().join('.');
-            document.getElementById('addModal').classList.add('show');
-        }
+    // date может быть '15.04.2026' или '2026-04-15'
+    let displayDate = date;
+    let hiddenDate = date;
+
+    if (date.includes('.')) {
+        // DD.MM.YYYY → преобразуем в YYYY-MM-DD для скрытого поля
+        const parts = date.split('.');
+        hiddenDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        displayDate = date;
+    } else if (date.includes('-')) {
+        const parts = date.split('-');
+        displayDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+        hiddenDate = date;
+    }
+
+    document.getElementById('modal-date').value = hiddenDate;
+    document.getElementById('modal-date-display').textContent = displayDate;
+    document.getElementById('addModal').classList.add('show');
+}
 
         /**
          * Закрыть модалку

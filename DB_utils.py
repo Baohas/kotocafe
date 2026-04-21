@@ -253,69 +253,82 @@ def create_user(login, password):
         INSERT INTO Dannve_avtorizacii (ID, Login, Password, ID_Sotrudnik) VALUES(?,?,?,?)
     ''', (new_id,login, password, new_id))
 def create_shift(date, start_time, end_time, employee):
+    """date приходит как '2026-04-15' → сохраняем как '15.04.2026'"""
+    try:
+        dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+        db_date = dt.strftime('%d.%m.%Y')
+    except:
+        db_date = date
+
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
     cursor = connection.cursor()
-    last_id = cursor.execute('''
-                SELECT ID FROM Smena
-        ''').fetchall()
-    new_id = 0
-    if last_id == []:
-        new_id = 1
-    else:
-        new_id= last_id[-1][0]+1
+
+    last_id = cursor.execute("SELECT ID FROM Smena ORDER BY ID DESC").fetchone()
+    new_id = 1 if not last_id else last_id[0] + 1
+
     fam = get_ID_by_family(employee)
+
     cursor.execute('''
-        INSERT INTO Smena (ID, Date, Planovoe_nachalo, Planovoe_okonchanie, Dlitelnost, ID_Sotrudnik) VALUES(?,?,?,?,?,?)
-    ''', (new_id,date, start_time, end_time, 0, fam))
+        INSERT INTO Smena (ID, Date, Planovoe_nachalo, Planovoe_okonchanie, Dlitelnost, ID_Sotrudnik)
+        VALUES(?,?,?,?,?,?)
+    ''', (new_id, db_date, start_time, end_time, 0, fam))
+
     connection.commit()
     connection.close()
+    print(f"Смена сохранена: {db_date} {start_time}–{end_time} (ID={new_id})")
 
 def get_shifts(year=None, month=None):
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
     cursor = connection.cursor()
+
     if year is None or month is None:
         year = datetime.datetime.now().year
         month = datetime.datetime.now().month
-    start_date = f"01.{month:02d}.{year}"
-    end_date = f"01.{1 if month == 12 else month + 1:02d}.{year + 1 if month == 12 else year}"
+
+    # Надёжный поиск по месяцу и году (не зависит от строкового сравнения)
     rows = cursor.execute('''
-        SELECT Date, Planovoe_nachalo, Planovoe_okonchanie, ID_Sotrudnik, ID FROM Smena WHERE Date >= ? AND Date < ?
-    ''', (start_date, end_date)).fetchall()
+        SELECT Date, Planovoe_nachalo, Planovoe_okonchanie, ID_Sotrudnik, ID 
+        FROM Smena 
+        WHERE substr(Date, 4, 2) = ? 
+          AND substr(Date, 7, 4) = ?
+        ORDER BY Date, Planovoe_nachalo
+    ''', (f"{month:02d}", str(year))).fetchall()
+
+    print(f"DEBUG: Найдено {len(rows)} смен за {month:02d}.{year}")
+
     shifts_by_date = {}
     for row in rows:
-        d = row[0]
-
+        d = row[0]   # '25.04.2026'
         shifts_by_date.setdefault(d, []).append({
+            'id': row[4],                    # настоящий ID смены
             'employee': get_employee_by_ID(row[3]),
             'start': row[1],
-            'end':row[2],
-            'id': row[3]
+            'end': row[2]
         })
 
     weeks = get_calendar_data(year, month, shifts_by_date)
-    months = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь',
-                      7: 'Июль', 8: 'Август', 9: 'Сентябрь', 10: 'Октябрь', 11: 'Ноябрь', 12: 'Декабрь'}
-    month_name = months[month]
+
+    months = {1:'Январь',2:'Февраль',3:'Март',4:'Апрель',5:'Май',6:'Июнь',
+              7:'Июль',8:'Август',9:'Сентябрь',10:'Октябрь',11:'Ноябрь',12:'Декабрь'}
+
+    employees_raw = get_employee_by_ID(0)
+    employees = [row[0] for row in employees_raw]
 
     prev_month = month - 1 if month > 1 else 12
     prev_year = year if month > 1 else year - 1
     next_month = month + 1 if month < 12 else 1
     next_year = year if month < 12 else year + 1
 
-    employees = [i for i in get_employee_by_ID(0)[0]]
-
-    data = {
+    return {
         'weeks': weeks,
         'year': year,
-        'month': month,
-        'month_name': month_name,
+        'month_name': months[month],
         'employees': employees,
         'prev_year': prev_year,
         'prev_month': prev_month,
         'next_year': next_year,
         'next_month': next_month
     }
-    return data
 
 def update_shift(employee, start_time, end_time, id_smena):
     connection = sqlite3.connect('kotocafe.db', check_same_thread=False)
@@ -327,7 +340,6 @@ def update_shift(employee, start_time, end_time, id_smena):
     ''', (get_ID_by_family(employee), start_time, end_time, id_smena))
     connection.commit()
     connection.close()
-    print("Updated!")
 
 #endregion
 """def sotrudnik(ID, Family, Name, Otchestvo, Phone, Work_phone, Address_email,ID_Role, ID_Doljnost, ID_Pol):
